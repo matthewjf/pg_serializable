@@ -1,5 +1,9 @@
-require "pg_serializable/version"
-require "active_support/concern"
+require 'active_support/concern'
+
+require 'pg_serializable/version'
+require 'pg_serializable/errors'
+require 'pg_serializable/aliaser'
+require 'pg_serializable/nodes'
 
 module PgSerializable
   extend ActiveSupport::Concern

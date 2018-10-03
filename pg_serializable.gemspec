@@ -11,7 +11,7 @@ Gem::Specification.new do |spec|
 
   spec.summary       = %q{serializes rails models from postgres (9.5+)}
   spec.description   = %q{serializes rails models from postgres (9.5+)}
-  spec.homepage      = "no"
+  spec.homepage      = "https://github.com/matthewjf/pg_serializable"
   spec.license       = "MIT"
 
   # Prevent pushing this gem to RubyGems.org. To allow pushes either set the 'allowed_push_host'

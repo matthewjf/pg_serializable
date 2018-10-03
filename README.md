@@ -1,8 +1,8 @@
 # PgSerializable
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/pg_serializable`. To experiment with that code, run `bin/console` for an interactive prompt.
+This is experimental.
 
-TODO: Delete this and the text above, and describe your gem
+Serialize json directly from postgres (9.4+).
 
 ## Installation
 
@@ -22,17 +22,263 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+In your model:
+```ruby
+require 'pg_serializable'
+
+class Product < ApplicationRecord
+  include PgSerializable
+
+  serializable do
+    attributes :name, :id
+    attribute :name, label: :test_name
+  end
+end
+```
+
+You can also include it in your `ApplicationRecord` so all models will be serializable.
+
+In your controller:
+```ruby
+render json: Product.limit(200).order(updated_at: :desc).json
+```
+
+It works with single records:
+```ruby
+render json: Product.find(10).json
+```
+
+### Attributes
+List attributes:
+```ruby
+attributes :name, :id
+```
+results in:
+```json
+[  
+  {
+    "id": 503,
+    "name": "Direct Viewer"
+  },
+  {
+    "id": 502,
+    "name": "Side Disc Bracket"
+  }
+]
+```
+Re-label individual attributes:
+```ruby
+attributes :id
+attribute :name, label: :different_name
+```
+```json
+[
+  {
+    "id": 503,
+    "different_name": "Direct Viewer"
+  },
+  {
+    "id": 502,
+    "different_name": "Side Disc Bracket"
+  }
+]
+```
+
+Wrap attributes in custom sql
+```ruby
+serializable do
+  attributes :id
+  attribute :active, label: :deleted { |v| "NOT #{v}" }
+end
+```
+```sql
+SELECT
+  COALESCE(json_agg(
+    json_build_object('id', a0.id, 'deleted', NOT a0.active)
+  ), '[]'::json)
+FROM (
+  SELECT "products".*
+  FROM "products"
+  ORDER BY "products"."updated_at" DESC
+  LIMIT 2
+) a0
+```
+```json
+[
+  {
+    "id": 503,
+    "deleted": false
+  },
+  {
+    "id": 502,
+    "deleted": false
+  }
+]
+```
+
+
+### Associations
+Supported associations:
+- `belongs_to`
+- `has_many`
+- `has_many :through`
+- `has_one`
+
+#### belongs_to
+```ruby
+serializable do
+  attributes :id, :name
+  belongs_to: :label
+end
+```
+```json
+[
+  {
+    "id": 503,
+    "label": {
+      "name": "Piper",
+      "id": 106
+    }
+  },
+  {
+    "id": 502,
+    "label": {
+      "name": "Sebrina",
+      "id": 77
+    }
+  }
+]
+```
+
+#### has_many
+Works for nested relationships
+```ruby
+class Product < ApplicationRecord
+  serializable do
+    attributes :id, :name
+    has_many: :variations
+  end
+end
+
+class Variation < ApplicationRecord
+  serializable do
+    attributes :id, :hex
+    belongs_to: :color
+  end
+end
+
+class Color < ApplicationRecord
+  serializable do
+    attributes :id, :hex
+  end
+end
+```
+```json
+[
+  {
+    "id": 503,
+    "variations": [
+      {
+        "name": "Cormier",
+        "id": 2272,
+        "color": {
+          "id": 5,
+          "hex": "f4b9c8"
+        }
+      },
+      {
+        "name": "Spencer",
+        "id": 2271,
+        "color": {
+          "id": 586,
+          "hex": "2e0719"
+        }
+      }
+    ]
+  },
+  {
+    "id": 502,
+    "variations": [
+      {
+        "name": "DuBuque",
+        "id": 2270,
+        "color": {
+          "id": 593,
+          "hex": "0b288f"
+        }
+      },
+      {
+        "name": "Berge",
+        "id": 2269,
+        "color": {
+          "id": 536,
+          "hex": "b2bfee"
+        }
+      }
+    ]
+  }
+]
+```
+
+#### has_many :through
+```ruby
+class Product < ApplicationRecord
+  has_many :categories_products
+  has_many :categories, through: :categories_products
+
+  serializable do
+    attributes :id
+    has_many :categories
+  end
+end
+
+class Category < ApplicationRecord
+  serializable do
+    attributes :name, :id
+  end
+end
+```
+
+```json
+[
+  {
+    "id": 503,
+    "categories": [
+      {
+        "name": "Juliann",
+        "id": 13
+      },
+      {
+        "name": "Teressa",
+        "id": 176
+      },
+      {
+        "name": "Garret",
+        "id": 294
+      }
+    ]
+  },
+  {
+    "id": 502,
+    "categories": [
+      {
+        "name": "Rossana",
+        "id": 254
+      }
+    ]
+  }
+]
+```
+#### has_one
+TODO: write examples
 
 ## Development
 
-After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
-
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+TODO
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/pg_serializable. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
+Bug reports and pull requests are welcome on GitHub at https://github.com/matthewjf/pg_serializable. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
 
 ## License
 

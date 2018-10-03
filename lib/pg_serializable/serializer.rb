@@ -13,8 +13,8 @@ module PgSerializable
       end
     end
 
-    def attribute(column_name, label: nil)
-      @attributes << Nodes::Attribute.new(column_name, label: label) if column_exists?(column_name)
+    def attribute(column_name, label: nil, &blk)
+      @attributes << Nodes::Attribute.new(column_name, label: label, &blk) if column_exists?(column_name)
     end
 
     def has_many(association, label: nil)

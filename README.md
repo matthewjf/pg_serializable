@@ -4,6 +4,58 @@ This is experimental.
 
 Serialize json directly from postgres (9.4+).
 
+## Why?
+Models:
+```ruby
+class Product < ApplicationRecord
+  has_many :categories_products
+  has_many :categories, through: :categories_products
+  has_many :variations
+  belongs_to :label
+end
+class Variation < ApplicationRecord
+  belongs_to :product
+  belongs_to :color
+end
+class Color < ApplicationRecord
+  has_many :variations
+end
+class Label < ApplicationRecord
+  has_many :products
+end
+class Category < ApplicationRecord
+  has_many :categories_products
+  has_many :products, through: :categories_products
+end
+```
+
+Using Jbuilder+ActiveRecord:
+```ruby
+class Api::ProductsController < ApplicationController
+  def index
+    @products = Product.limit(200)
+                       .order(updated_at: :desc)
+                       .includes(:categories, :label, variations: :color)
+    render 'api/products/index.json.jbuilder'
+  end
+end
+```
+```shell
+Completed 200 OK in 2521ms (Views: 2431.8ms | ActiveRecord: 45.7ms)
+```
+
+Using PgSerializable:
+```ruby
+class Api::ProductsController < ApplicationController
+  def index
+    render json: Product.limit(200).order(updated_at: :desc).json
+  end
+end
+```
+```shell
+Completed 200 OK in 122ms (Views: 0.2ms | ActiveRecord: 66.8ms)
+```
+
 ## Installation
 
 Add this line to your application's Gemfile:

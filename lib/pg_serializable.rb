@@ -4,6 +4,7 @@ require 'pg_serializable/version'
 require 'pg_serializable/errors'
 require 'pg_serializable/aliaser'
 require 'pg_serializable/nodes'
+require 'pg_serializable/serializer'
 
 module PgSerializable
   extend ActiveSupport::Concern

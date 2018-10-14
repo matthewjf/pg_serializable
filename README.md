@@ -44,6 +44,21 @@ end
 Completed 200 OK in 2521ms (Views: 2431.8ms | ActiveRecord: 45.7ms)
 ```
 
+Using fast_jsonapi:
+```ruby
+class Api::ProductsController < ApplicationController
+  def index
+    @products = Product.limit(200)
+                       .order(updated_at: :desc)
+                       .includes(:categories, :label, variations: :color)
+    render json: ProductSerializer.new(@products).serialized_json
+  end
+end
+```
+```shell
+Completed 200 OK in 315ms (Views: 0.2ms | ActiveRecord: 50.3ms)
+```
+
 Using PgSerializable:
 ```ruby
 class Api::ProductsController < ApplicationController
@@ -53,8 +68,17 @@ class Api::ProductsController < ApplicationController
 end
 ```
 ```shell
-Completed 200 OK in 89ms (Views: 0.1ms | ActiveRecord: 78.9ms)
+Completed 200 OK in 109ms (Views: 0.2ms | ActiveRecord: 87.1ms)
 ```
+
+Benchmarking `fast_jsonapi` against `pg_serializable` on 100 requests:
+```shell
+                      user     system      total        real
+fast_jsonapi     21.510000   0.700000  22.210000 ( 26.994325)
+pg_serializable   1.470000   0.170000   1.640000 (  9.187275)
+```
+
+You'll see the greatest benefits from PgSerializable for deeply nested json objects.
 
 ## Installation
 
@@ -475,14 +499,10 @@ render json: Product.limit(3).json(trait: :with_variations)
 
 TODO
 
-## Contributing
-
-Bug reports and pull requests are welcome on GitHub at https://github.com/matthewjf/pg_serializable. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
-
 ## License
 
 The gem is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).
 
-## Code of Conduct
+## Acknowledgements
 
-Everyone interacting in the PgSerializable project’s codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/[USERNAME]/pg_serializable/blob/master/CODE_OF_CONDUCT.md).
+Full credit Colin Rhodes for the idea.

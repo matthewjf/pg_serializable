@@ -38,4 +38,5 @@ Gem::Specification.new do |spec|
 
   spec.add_runtime_dependency "activesupport", "~> 5.2"
   spec.add_runtime_dependency "activerecord", "~> 5.2"
+  spec.add_runtime_dependency "oj", "~> 3.6"
 end

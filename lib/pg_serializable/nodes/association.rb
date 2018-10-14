@@ -1,13 +1,14 @@
 module PgSerializable
   module Nodes
     class Association < Base
-      attr_reader :klass, :name
+      attr_reader :klass, :name, :trait, :type, :label
 
-      def initialize(klass, name, type, label: nil)
+      def initialize(klass, name, type, label: nil, trait: :default)
         @name = name
         @klass = klass
         @type = type
         @label = label || name
+        @trait = trait
       end
 
       def to_sql(outer_alias, aliaser)
@@ -18,10 +19,22 @@ module PgSerializable
         @target ||= association.klass
       end
 
+      def association
+        @association ||= @klass.reflect_on_association(@name)
+      end
+
+      def foreign_key
+        @foreign_key ||= association.join_foreign_key
+      end
+
+      def primary_key
+        @primary_key ||= association.join_primary_key
+      end
+
       private
 
       def value(outer_alias, aliaser)
-        next_alias = aliaser.next!
+        next_alias = aliaser.next!.dup
         self.send(@type, outer_alias, next_alias, aliaser)
       end
 
@@ -53,18 +66,6 @@ module PgSerializable
 
       def belongs_to(outer_alias, next_alias, aliaser)
         target.as_json_object(aliaser).where("#{next_alias}.#{primary_key}=#{outer_alias}.#{foreign_key}").to_sql
-      end
-
-      def association
-        @association ||= @klass.reflect_on_association(@name)
-      end
-
-      def foreign_key
-        @foreign_key ||= association.join_foreign_key
-      end
-
-      def primary_key
-        @primary_key ||= association.join_primary_key
       end
     end
   end

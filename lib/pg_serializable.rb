@@ -1,47 +1,58 @@
+require 'oj'
 require 'active_support/concern'
-
-require 'pg_serializable/version'
 require 'pg_serializable/errors'
-require 'pg_serializable/aliaser'
+require 'pg_serializable/visitable'
 require 'pg_serializable/nodes'
-require 'pg_serializable/serializer'
+require 'pg_serializable/trait_manager'
+require 'pg_serializable/trait'
+require 'pg_serializable/visitors'
+
+module ActiveRecord
+  class Relation
+    include PgSerializable::Visitable
+
+    def json
+      to_pg_json accept(PgSerializable::Visitors::Json.new)
+    end
+  end
+end
 
 module PgSerializable
   extend ActiveSupport::Concern
+
   included do
+    include Visitable
+
     def json
-      ActiveRecord::Base.connection.select_one(
-        self.class.where(id: id).limit(1).as_json_object.to_sql
-      )['json_build_object']
+      self.class.to_pg_json accept(PgSerializable::Visitors::Json.new)
     end
   end
 
   class_methods do
     def json
-      ActiveRecord::Base.connection.select_one(
-        serializer.as_json_array(pg_scope, Aliaser.new).to_sql
-      )['coalesce']
-    end
-
-    def as_json_array(table_alias = Aliaser.new)
-      serializer.as_json_array(pg_scope, table_alias)
-    end
-
-    def as_json_object(table_alias = Aliaser.new)
-      serializer.as_json_object(pg_scope, table_alias)
+      to_pg_json accept(PgSerializable::Visitors::Json.new)
     end
 
     def serializable(&blk)
-      serializer.instance_eval &blk
-      serializer.check_for_cycles!
+      trait_manager.instance_eval &blk
+      validate_traits!
     end
 
-    def serializer
-      @serializer ||= Serializer.new(self)
+    def trait_manager
+      @trait_manager ||= TraitManager.new(self)
     end
 
-    def pg_scope
-      respond_to?(:to_sql) ? self : all
+    def accept visitor, **kwargs
+      visitor.visit self, **kwargs
     end
+
+    def to_pg_json(scope)
+      res = scope.as_json.first
+      ::Oj.dump(res['coalesce'] || res['json_build_object'])
+    end
+
+    private
+
+    delegate :validate_traits!, to: :trait_manager
   end
 end

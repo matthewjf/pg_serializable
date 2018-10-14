@@ -53,7 +53,7 @@ class Api::ProductsController < ApplicationController
 end
 ```
 ```shell
-Completed 200 OK in 122ms (Views: 0.2ms | ActiveRecord: 66.8ms)
+Completed 200 OK in 89ms (Views: 0.1ms | ActiveRecord: 78.9ms)
 ```
 
 ## Installation
@@ -82,8 +82,10 @@ class Product < ApplicationRecord
   include PgSerializable
 
   serializable do
-    attributes :name, :id
-    attribute :name, label: :test_name
+    default do
+      attributes :name, :id
+      attribute :name, label: :test_name
+    end
   end
 end
 ```
@@ -139,8 +141,10 @@ attribute :name, label: :different_name
 Wrap attributes in custom sql
 ```ruby
 serializable do
-  attributes :id
-  attribute :active, label: :deleted { |v| "NOT #{v}" }
+  default do
+    attributes :id
+    attribute :active, label: :deleted { |v| "NOT #{v}" }
+  end
 end
 ```
 ```sql
@@ -167,7 +171,38 @@ FROM (
   }
 ]
 ```
+### Traits
 
+```ruby
+serializable do
+  default do
+    attributes :id, :name
+  end
+
+  trait :simple do
+    attributes :id
+  end
+end
+```
+
+```ruby
+render json: Product.limit(10).json(trait: :simple)
+```
+
+```json
+[
+  { "id": 1 },
+  { "id": 2 },
+  { "id": 3 },
+  { "id": 4 },
+  { "id": 5 },
+  { "id": 6 },
+  { "id": 7 },
+  { "id": 8 },
+  { "id": 9 },
+  { "id": 10 }
+]
+```
 
 ### Associations
 Supported associations:
@@ -179,8 +214,10 @@ Supported associations:
 #### belongs_to
 ```ruby
 serializable do
-  attributes :id, :name
-  belongs_to: :label
+  default do
+    attributes :id, :name
+    belongs_to: :label
+  end
 end
 ```
 ```json
@@ -207,21 +244,27 @@ Works for nested relationships
 ```ruby
 class Product < ApplicationRecord
   serializable do
-    attributes :id, :name
-    has_many: :variations
+    default do
+      attributes :id, :name
+      has_many: :variations
+    end
   end
 end
 
 class Variation < ApplicationRecord
   serializable do
-    attributes :id, :hex
-    belongs_to: :color
+    default do
+      attributes :id, :name
+      belongs_to: :color
+    end
   end
 end
 
 class Color < ApplicationRecord
   serializable do
-    attributes :id, :hex
+    default do
+      attributes :id, :hex
+    end
   end
 end
 ```
@@ -279,14 +322,18 @@ class Product < ApplicationRecord
   has_many :categories, through: :categories_products
 
   serializable do
-    attributes :id
-    has_many :categories
+    default do
+      attributes :id
+      has_many :categories
+    end
   end
 end
 
 class Category < ApplicationRecord
   serializable do
-    attributes :name, :id
+    default do
+      attributes :name, :id
+    end
   end
 end
 ```
@@ -323,6 +370,106 @@ end
 ```
 #### has_one
 TODO: write examples
+
+### Association Traits
+Models:
+```ruby
+class Product < ApplicationRecord
+  has_many :variations
+
+  serializable do
+    default do
+      attributes :id, :name
+    end
+
+    trait :with_variations do
+      attributes :id
+      has_many :variations, trait: :for_products
+    end
+  end
+end
+
+class Variation < ApplicationRecord
+  serializable do
+    default do
+      attributes :id
+      belongs_to: :color
+    end
+
+    trait :for_products do
+      attributes :id
+    end
+  end
+end
+```
+
+Controller:
+```ruby
+render json: Product.limit(3).json(trait: :with_variations)
+```
+
+```json
+[
+   {
+      "id":1,
+      "variations":[
+
+      ]
+   },
+   {
+      "id":2,
+      "variations":[
+         {
+            "id":5
+         },
+         {
+            "id":4
+         },
+         {
+            "id":3
+         },
+         {
+            "id":2
+         },
+         {
+            "id":1
+         }
+      ]
+   },
+   {
+      "id":3,
+      "variations":[
+         {
+            "id":14
+         },
+         {
+            "id":13
+         },
+         {
+            "id":12
+         },
+         {
+            "id":11
+         },
+         {
+            "id":10
+         },
+         {
+            "id":9
+         },
+         {
+            "id":8
+         },
+         {
+            "id":7
+         },
+         {
+            "id":6
+         }
+      ]
+   }
+]
+```
 
 ## Development
 

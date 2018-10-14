@@ -11,8 +11,8 @@ module ActiveRecord
   class Relation
     include PgSerializable::Visitable
 
-    def json
-      to_pg_json accept(PgSerializable::Visitors::Json.new)
+    def json(trait: :default)
+      to_pg_json accept(PgSerializable::Visitors::Json.new, trait: trait)
     end
   end
 end
@@ -23,14 +23,14 @@ module PgSerializable
   included do
     include Visitable
 
-    def json
-      self.class.to_pg_json accept(PgSerializable::Visitors::Json.new)
+    def json(trait: :default)
+      self.class.to_pg_json accept(PgSerializable::Visitors::Json.new, trait: trait)
     end
   end
 
   class_methods do
-    def json
-      to_pg_json accept(PgSerializable::Visitors::Json.new)
+    def json(trait: :default)
+      to_pg_json accept(PgSerializable::Visitors::Json.new, trait: trait)
     end
 
     def serializable(&blk)

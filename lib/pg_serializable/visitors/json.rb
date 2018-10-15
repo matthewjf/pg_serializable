@@ -42,9 +42,20 @@ module PgSerializable
       end
 
       def visit_attribute(subject, table_alias: nil)
+        return visit_enum(subject, table_alias: table_alias) if subject.enum?
         table_alias ||= alias_tracker
         key = "\'#{subject.label}\'"
         val = "\"#{table_alias}\".\"#{subject.prc ? subject.prc.call(column_name) : subject.column_name}\""
+        "#{key}, #{val}"
+      end
+
+      def visit_enum(subject, table_alias: nil)
+        key = "\'#{subject.label}\'"
+        enum_hash = subject.klass.defined_enums[subject.column_name.to_s]
+        val = "CASE \"#{table_alias}\".\"#{subject.column_name}\" " +
+        enum_hash.map do |val, int|
+          "WHEN #{int} THEN \'#{subject.prc ? subject.prc.call(val) : val}\'"
+        end.join(' ') + " ELSE NULL END"
         "#{key}, #{val}"
       end
 

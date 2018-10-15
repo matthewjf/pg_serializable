@@ -9,6 +9,10 @@ module PgSerializable
         @label = label || column_name
         @prc = prc if block_given?
       end
+
+      def enum?
+        @enum ||= klass.defined_enums.has_key? column_name.to_s
+      end
     end
   end
 end

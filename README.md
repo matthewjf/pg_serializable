@@ -41,7 +41,7 @@ class Api::ProductsController < ApplicationController
 end
 ```
 ```shell
-Completed 200 OK in 2521ms (Views: 2431.8ms | ActiveRecord: 45.7ms)
+Completed 200 OK in 7169ms (Views: 7129.1ms | ActiveRecord: 39.3ms)
 ```
 
 Using fast_jsonapi:
@@ -56,7 +56,7 @@ class Api::ProductsController < ApplicationController
 end
 ```
 ```shell
-Completed 200 OK in 315ms (Views: 0.2ms | ActiveRecord: 50.3ms)
+Completed 200 OK in 916ms (Views: 0.2ms | ActiveRecord: 41.6ms)
 ```
 
 Using PgSerializable:
@@ -68,14 +68,14 @@ class Api::ProductsController < ApplicationController
 end
 ```
 ```shell
-Completed 200 OK in 109ms (Views: 0.2ms | ActiveRecord: 87.1ms)
+Completed 200 OK in 82ms (Views: 0.2ms | ActiveRecord: 60.8ms)
 ```
 
 Benchmarking `fast_jsonapi` against `pg_serializable` on 100 requests:
 ```shell
                       user     system      total        real
-fast_jsonapi     21.510000   0.700000  22.210000 ( 26.994325)
-pg_serializable   1.470000   0.170000   1.640000 (  9.187275)
+fast_jsonapi     62.070000   1.250000  63.320000 ( 85.660947)
+pg_serializable   1.700000   0.110000   1.810000 (  6.751079)
 ```
 
 You'll see the greatest benefits from PgSerializable for deeply nested json objects.

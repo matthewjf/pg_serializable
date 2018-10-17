@@ -51,7 +51,11 @@ class Api::ProductsController < ApplicationController
     @products = Product.limit(200)
                        .order(updated_at: :desc)
                        .includes(:categories, :label, variations: :color)
-    render json: ProductSerializer.new(@products).serialized_json
+    options = {
+      include: [:categories, :variations, :label, :'variations.color']
+    }
+
+    render json: ProductSerializer.new(@products, options).serialized_json
   end
 end
 ```

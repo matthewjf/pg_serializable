@@ -245,7 +245,7 @@ Supported associations:
 serializable do
   default do
     attributes :id, :name
-    belongs_to: :label
+    belongs_to :label
   end
 end
 ```
@@ -275,7 +275,7 @@ class Product < ApplicationRecord
   serializable do
     default do
       attributes :id, :name
-      has_many: :variations
+      has_many :variations
     end
   end
 end
@@ -284,7 +284,7 @@ class Variation < ApplicationRecord
   serializable do
     default do
       attributes :id, :name
-      belongs_to: :color
+      belongs_to :color
     end
   end
 end
@@ -398,7 +398,48 @@ end
 ]
 ```
 #### has_one
-TODO: write examples
+
+```ruby
+class Product < ApplicationRecord
+  has_one :variation
+
+  serializable do
+    default do
+      attributes :name, :id
+      has_one :variation
+    end
+  end
+end
+```
+
+```json
+[
+  {
+    "name": "GPS Kit",
+    "id": 1003,
+    "variation": {
+      "name": "Gottlieb",
+      "id": 4544,
+      "color": {
+        "id": 756,
+        "hex": "67809b"
+      }
+    }
+  },
+  {
+    "name": "Video Transmitter",
+    "id": 1002,
+    "variation": {
+      "name": "Hessel",
+      "id": 4535,
+      "color": {
+        "id": 111,
+        "hex": "144f9e"
+      }
+    }
+  }
+]
+```
 
 ### Association Traits
 Models:
@@ -436,7 +477,7 @@ Controller:
 ```ruby
 render json: Product.limit(3).json(trait: :with_variations)
 ```
-
+Response:
 ```json
 [
    {

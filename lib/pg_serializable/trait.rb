@@ -28,5 +28,9 @@ module PgSerializable
     def has_one(association, label: nil, trait: :default)
       @attribute_nodes << Nodes::Association.new(klass, association, :has_one, label: label, trait: trait)
     end
+
+    def has_and_belongs_to_many(association, label: nil, trait: :default)
+      @attribute_nodes << Nodes::Association.new(klass, association, :has_and_belongs_to_many, label: label, trait: trait)
+    end
   end
 end

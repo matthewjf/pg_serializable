@@ -138,7 +138,7 @@ attributes :name, :id
 ```
 results in:
 ```json
-[  
+[
   {
     "id": 503,
     "name": "Direct Viewer"
@@ -238,6 +238,7 @@ Supported associations:
 - `belongs_to`
 - `has_many`
 - `has_many :through`
+- `has_and_belongs_to_many`
 - `has_one`
 
 #### belongs_to
@@ -397,6 +398,60 @@ end
   }
 ]
 ```
+
+#### has_many_and_belongs_to_many
+```ruby
+class Product < ApplicationRecord
+  has_and_belongs_to_many :categories
+
+  serializable do
+    default do
+      attributes :id
+      has_and_belongs_to_many :categories
+    end
+  end
+end
+
+class Category < ApplicationRecord
+  serializable do
+    default do
+      attributes :name, :id
+    end
+  end
+end
+```
+
+```json
+[
+  {
+    "id": 503,
+    "categories": [
+      {
+        "name": "Juliann",
+        "id": 13
+      },
+      {
+        "name": "Teressa",
+        "id": 176
+      },
+      {
+        "name": "Garret",
+        "id": 294
+      }
+    ]
+  },
+  {
+    "id": 502,
+    "categories": [
+      {
+        "name": "Rossana",
+        "id": 254
+      }
+    ]
+  }
+]
+```
+
 #### has_one
 
 ```ruby

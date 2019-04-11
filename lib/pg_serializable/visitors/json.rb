@@ -102,6 +102,22 @@ module PgSerializable
         "\'#{subject.label}\', (#{query})"
       end
 
+      def visit_has_and_belongs_to_many(subject, table_alias:, **kwargs)
+        current_alias = next_alias!
+        association = subject.association
+        join_table = association.join_table
+        source = association.source_reflection
+
+        query = visit(association
+          .klass
+          .select("#{source.table_name}.*, #{join_table}.#{source.association_foreign_key}, #{join_table}.#{association.join_primary_key}")
+          .joins("INNER JOIN #{join_table} ON #{join_table}.#{source.association_foreign_key}=#{source.table_name}.#{source.association_primary_key}"), table_alias: current_alias)
+          .where("#{current_alias}.#{association.join_primary_key}=#{table_alias}.#{subject.foreign_key}")
+          .to_sql
+
+        "\'#{subject.label}\', (#{query})"
+      end
+
       def visit_has_one(subject, table_alias:, **kwargs)
         current_alias = next_alias!
         subquery_alias = next_alias!

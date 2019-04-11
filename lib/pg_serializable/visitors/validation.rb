@@ -41,7 +41,7 @@ module PgSerializable
           raise PgSerializable::AssociationError.new("association `#{name.to_s}` doesn't exist for class #{klass}")
         end
         if subject.target.trait_manager.get_trait(subject.trait).nil?
-          raise PgSerializable::AssociationError.new("trait `#{subect.trait}` doesn't exist for class #{subject.target}")
+          raise PgSerializable::AssociationError.new("trait `#{subject.trait}` doesn't exist for class #{subject.target}")
         end
       end
 

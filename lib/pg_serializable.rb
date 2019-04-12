@@ -37,7 +37,10 @@ module PgSerializable
 
     def serializable(&blk)
       trait_manager.instance_eval &blk
-      validate_traits!
+      begin
+        validate_traits!
+      rescue ActiveRecord::NoDatabaseError
+      end
     end
 
     def trait_manager

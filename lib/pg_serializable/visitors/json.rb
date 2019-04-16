@@ -91,12 +91,19 @@ module PgSerializable
         association = subject.association
         through = association.through_reflection
         source = association.source_reflection
+        join_name = source.collection? ? through.plural_name.to_sym : through.name
+        where_clause = begin
+          if through.belongs_to?
+            "#{table_alias}.#{through.join_foreign_key}=#{through.table_name}.#{subject.foreign_key}"
+          else
+            "#{through.table_name}.#{through.join_foreign_key}=#{table_alias}.#{subject.foreign_key}"
+          end
+        end
 
         query = visit(association
           .klass
-          .select("#{source.table_name}.*, #{through.table_name}.#{source.join_foreign_key}, #{through.table_name}.#{through.join_primary_key}")
-          .joins(through.name), table_alias: current_alias)
-          .where("#{current_alias}.#{through.join_primary_key}=#{table_alias}.#{subject.foreign_key}")
+          .joins(join_name)
+          .where(where_clause), table_alias: current_alias)
           .to_sql
 
         "\'#{subject.label}\', (#{query})"

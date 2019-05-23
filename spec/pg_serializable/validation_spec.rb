@@ -30,7 +30,7 @@ RSpec.describe "validation" do
   end
 
   context "associations" do
-    it "must have the association" do
+    it "raises error when association doesn't exist" do
       expect do
         class Product < ApplicationRecord
           serializable do
@@ -42,8 +42,7 @@ RSpec.describe "validation" do
       end.to raise_error(PgSerializable::AssociationError)
     end
 
-    it "must not have cycles" do
-
+    it "raises error when cycles exist" do
       expect do
         class Label < ApplicationRecord
           has_many :products

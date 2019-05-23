@@ -1,9 +1,9 @@
 class Product < ApplicationRecord
-  # has_many :categories_products
-  # has_many :categories, through: :categories_products
   has_and_belongs_to_many :categories
   has_many :variations
+  has_many :colors, through: :variations
   belongs_to :label
+
   enum product_type: {
     color: 0,
     material: 1,
@@ -13,10 +13,8 @@ class Product < ApplicationRecord
   serializable do
     default do
       attributes :name, :id
-      # attribute :name, label: :test_name
       has_many :variations
       belongs_to :label
-      # has_many :categories
     end
 
     trait :simple do
@@ -26,8 +24,12 @@ class Product < ApplicationRecord
 
     trait :habtm do
       attributes :id, :name
-      # has_many :categories
       has_and_belongs_to_many :categories
+    end
+
+    trait :with_colors do
+      attributes :id, :name
+      has_many :colors
     end
   end
 end

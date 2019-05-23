@@ -1,5 +1,4 @@
 require 'spec_helper'
-require 'pry'
 
 RSpec.describe "validation" do
   context "attributes" do
@@ -35,7 +34,7 @@ RSpec.describe "validation" do
         class Product < ApplicationRecord
           serializable do
             default do
-              belongs_to :label
+              belongs_to :nonexistant
             end
           end
         end

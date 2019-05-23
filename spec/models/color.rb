@@ -4,8 +4,7 @@ class Color < ApplicationRecord
 
   serializable do
     default do
-      # attributes :id, :hex
-      has_many :products
+      attributes :id, :hex
     end
   end
 end

@@ -8,8 +8,6 @@ require 'pg_serializable/trait_manager'
 require 'pg_serializable/trait'
 require 'pg_serializable/visitors'
 
-Oj.mimic_JSON()
-
 module ActiveRecord
   class Relation
     include PgSerializable::Visitable

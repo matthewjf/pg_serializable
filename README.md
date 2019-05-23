@@ -596,6 +596,10 @@ Response:
 ]
 ```
 
+## Without Rails
+
+Rails isn't a dependency of this gem. However, setting it up to work without Rails takes some work. The `specs/support` folder has the initialization code needed to run the gem with just `ActiveSupport` and `ActiveRecord`.
+
 ## License
 
 The gem is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).

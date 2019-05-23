@@ -56,6 +56,7 @@ module PgSerializable
         case subject
         when trait? then subject.attribute_nodes.each { |node| check_for_cycles(node) }
         when association?
+          return if subject.association.nil? # skip if association isn't loaded yet, it'll get caught later
           if subject.target == @root_klass
             raise PgSerializable::AssociationError.new("class #{@root_klass} contains a cycle in nested association #{subject.klass}")
           end

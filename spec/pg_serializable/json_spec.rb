@@ -168,7 +168,6 @@ RSpec.describe "json" do
       ])
     end
 
-
     context 'with where scope' do
       let(:scope) { Product.limit(2).where(label: label1) }
       it 'supports scopes' do
@@ -193,6 +192,47 @@ RSpec.describe "json" do
         should eq([
           product1.slice(:id).merge(label: product1.label.slice(:id, :name)),
           product2.slice(:id).merge(label: product2.label.slice(:id, :name))
+        ])
+      end
+    end
+
+    context 'deeply nested and many associations' do
+      let(:scope) { Product }
+      let(:trait) { :complex }
+
+      it 'includes nested associations' do
+        should eq([
+          {
+            'id' => product1.id,
+            'name' => product1.name,
+            'label' => product1.label.slice(:name, :id),
+            'variations' => [
+              variation1.slice(:id, :name).merge({ color: variation1.color.slice(:id, :hex) }),
+              variation2.slice(:id, :name).merge({ color: variation2.color.slice(:id, :hex) })
+            ],
+            'categories' => [
+              category1.slice(:id, :name),
+              category2.slice(:id, :name)
+            ]
+          },
+          {
+            'id' => product2.id,
+            'name' => product2.name,
+            'label' => product2.label.slice(:name, :id),
+            'variations' => [
+              variation3.slice(:id, :name).merge({ color: variation3.color.slice(:id, :hex) })
+            ],
+            'categories' => [
+              category2.slice(:id, :name)
+            ]
+          },
+          {
+            'id' => product3.id,
+            'name' => product3.name,
+            'label' => nil,
+            'variations' => [],
+            'categories' => []
+          }
         ])
       end
     end

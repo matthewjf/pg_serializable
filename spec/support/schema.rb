@@ -35,6 +35,7 @@ ActiveRecord::Schema.define do
     t.datetime "updated_at", null: false
     t.bigint "label_id"
     t.integer "product_type"
+    t.boolean "active", default: true
     t.index ["label_id"], name: "index_products_on_label_id"
   end
 

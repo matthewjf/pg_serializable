@@ -12,24 +12,44 @@ class Product < ApplicationRecord
 
   serializable do
     default do
-      attributes :name, :id
-      has_many :variations
-      belongs_to :label
+      attributes :id, :name
     end
 
-    trait :simple do
+    trait :custom_sql do
+      attribute :active, label: :deleted do |v|
+        "NOT #{v}"
+      end
+    end
+
+    trait :enum do
+      attributes :product_type
+    end
+
+    trait :custom_attributes do
       attributes :id
-      has_many :variations, trait: :product
+      attribute :name, label: :custom_name
+    end
+
+    trait :has_many do
+      attributes :id
+      has_many :variations
     end
 
     trait :habtm do
-      attributes :id, :name
+      attributes :id
       has_and_belongs_to_many :categories
     end
 
-    trait :with_colors do
-      attributes :id, :name
+    trait :has_many_through do
+      attributes :id
       has_many :colors
+    end
+
+    trait :complex do
+      attributes :id, :name
+      belongs_to :label
+      has_many :variations, trait: :with_color
+      has_and_belongs_to_many :categories
     end
   end
 end

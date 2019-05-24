@@ -10,6 +10,7 @@ require_relative 'support/autoload.rb'
 require_relative 'models/application_record'
 
 Dir[File.join(__dir__, 'factories/**/*.rb')].each { |f| require f }
+Dir[File.join(__dir__, '../models/**/*.rb')].each { |f| require f }
 
 RSpec.configure do |config|
   config.example_status_persistence_file_path = ".rspec_status"

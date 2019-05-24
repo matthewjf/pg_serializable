@@ -3,7 +3,7 @@ class Category < ApplicationRecord
 
   serializable do
     default do
-      attributes :name, :id
+      attributes :id, :name
     end
   end
 end

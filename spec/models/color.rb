@@ -6,5 +6,10 @@ class Color < ApplicationRecord
     default do
       attributes :id, :hex
     end
+
+    trait :has_many_through do
+      attribute :id
+      has_many :products
+    end
   end
 end

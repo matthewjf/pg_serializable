@@ -45,7 +45,8 @@ module PgSerializable
         return visit_enum(subject, table_alias: table_alias) if subject.enum?
         table_alias ||= alias_tracker
         key = "\'#{subject.label}\'"
-        val = "\"#{table_alias}\".\"#{subject.prc ? subject.prc.call(column_name) : subject.column_name}\""
+        column_name = "\"#{table_alias}\".\"#{subject.column_name}\""
+        val = subject.prc ? subject.prc.call(column_name) : column_name
         "#{key}, #{val}"
       end
 
@@ -87,13 +88,15 @@ module PgSerializable
 
       def visit_has_many_through(subject, table_alias:, **kwargs)
         current_alias = next_alias!
-
         association = subject.association
         through = association.through_reflection
         source = association.source_reflection
         join_name = source.collection? ? through.plural_name.to_sym : through.name
+        # needs work
         where_clause = begin
-          if through.belongs_to?
+          if source.belongs_to?
+            "#{table_alias}.#{through.join_foreign_key}=#{through.table_name}.#{through.join_primary_key}"
+          elsif through.belongs_to?
             "#{table_alias}.#{through.join_foreign_key}=#{through.table_name}.#{subject.foreign_key}"
           else
             "#{through.table_name}.#{through.join_foreign_key}=#{table_alias}.#{subject.foreign_key}"

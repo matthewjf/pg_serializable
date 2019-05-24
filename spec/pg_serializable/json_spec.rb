@@ -24,22 +24,28 @@ RSpec.describe "json" do
 
     context 'with enums' do
       let(:trait) { :enum }
-      it { should eq({ 'product_type' => product.product_type }) }
+      it 'supports product type' do
+        should eq({ 'product_type' => product.product_type })
+      end
     end
 
     context 'with custom sql' do
       let(:trait) { :custom_sql }
-      it { should eq({ 'deleted' => !product.active }) }
+      it 'works' do
+        should eq({ 'deleted' => !product.active })
+      end
     end
 
     context 'with custom attributes' do
       let(:trait) { :custom_attributes}
-      it { should eq({ 'id' => product.id, 'custom_name' => product.name }) }
+      it 'allows custom labels' do
+        should eq({ 'id' => product.id, 'custom_name' => product.name })
+      end
     end
 
     context 'has many variations' do
       let(:trait) { :has_many }
-      it do
+      it 'supports :has_many' do
         should eq({
           'id' => product.id,
           'variations' => [
@@ -50,9 +56,20 @@ RSpec.describe "json" do
       end
     end
 
+    context 'belongs to label' do
+      let(:trait) { :belongs_to }
+
+      it 'supports :belongs_to' do
+        should eq({
+          'id' => product.id,
+          'label' => product.label.slice(:id, :name)
+        })
+      end
+    end
+
     context 'has and belongs to many categories' do
       let(:trait) { :habtm }
-      it do
+      it 'supports :has_and_belongs_to_many' do
         should eq({
           'id' => product.id,
           'categories' => [
@@ -71,7 +88,7 @@ RSpec.describe "json" do
         variation2
       end
 
-      it do
+      it 'supports :has_many through' do
         should eq({
           'id' => product.id,
           'colors' => [
@@ -81,7 +98,7 @@ RSpec.describe "json" do
         })
       end
 
-      it 'works for :has_many through a :belongs_to' do
+      it 'supports :has_many through a :belongs_to' do
         result_json = JSON.parse(color1.json(trait: :has_many_through))
 
         expect(result_json).to eq({
@@ -94,7 +111,7 @@ RSpec.describe "json" do
     context 'deeply nested and many associations' do
       let(:trait) { :complex }
 
-      it do
+      it 'includes nested associations' do
         should eq({
           'id' => product.id,
           'name' => product.name,
@@ -113,7 +130,6 @@ RSpec.describe "json" do
   end
 
   context 'collection' do
-
     let!(:label1) { FactoryBot.create(:label) }
     let!(:label2) { FactoryBot.create(:label) }
 
@@ -123,6 +139,7 @@ RSpec.describe "json" do
 
     let!(:product1) { FactoryBot.create(:product, label: label1) }
     let!(:product2) { FactoryBot.create(:product, label: label2) }
+    let!(:product3) { FactoryBot.create(:product, label: nil) }
 
     let!(:variation1) { FactoryBot.create(:variation, color: color1, product: product1) }
     let!(:variation2) { FactoryBot.create(:variation, color: color2, product: product1) }
@@ -131,6 +148,53 @@ RSpec.describe "json" do
     let!(:category1) { FactoryBot.create(:category, products: [product1]) }
     let!(:category2) { FactoryBot.create(:category, products: [product1, product2]) }
 
+    subject { JSON.parse(scope.json(trait: trait)) }
+    let(:trait) { :default }
+    let(:scope) { Product }
 
+    it 'works without trait' do
+      expect(JSON.parse(Product.json)).to match_array([
+        product1.slice(:name, :id),
+        product2.slice(:name, :id),
+        product3.slice(:name, :id)
+      ])
+    end
+
+    it 'with default trait' do
+      should match_array([
+        product1.slice(:name, :id),
+        product2.slice(:name, :id),
+        product3.slice(:name, :id)
+      ])
+    end
+
+
+    context 'with where scope' do
+      let(:scope) { Product.limit(2).where(label: label1) }
+      it 'supports scopes' do
+        should eq([ product1.slice(:id, :name) ])
+      end
+    end
+
+    context 'scope with joins' do
+      let(:scope) { Product.joins(:label) }
+      it do
+        should eq([
+          product1.slice(:id, :name),
+          product2.slice(:id, :name)
+        ])
+      end
+    end
+
+    context 'join with association included in trait' do
+      let(:scope) { Product.joins(:label) }
+      let(:trait) { :belongs_to }
+      it 'supports table aliasing' do
+        should eq([
+          product1.slice(:id).merge(label: product1.label.slice(:id, :name)),
+          product2.slice(:id).merge(label: product2.label.slice(:id, :name))
+        ])
+      end
+    end
   end
 end

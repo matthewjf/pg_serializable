@@ -30,6 +30,11 @@ class Product < ApplicationRecord
       attribute :name, label: :custom_name
     end
 
+    trait :belongs_to do
+      attributes :id
+      belongs_to :label
+    end
+
     trait :has_many do
       attributes :id
       has_many :variations

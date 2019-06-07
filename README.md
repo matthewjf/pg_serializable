@@ -1,6 +1,8 @@
 # PgSerializable
+[![codecov](https://codecov.io/gh/matthewjf/pg_serializable/branch/master/graph/badge.svg)](https://codecov.io/gh/matthewjf/pg_serializable)
+[![Maintainability](https://api.codeclimate.com/v1/badges/a99a88d28ad37a79dbf6/maintainability)](https://codeclimate.com/github/codeclimate/codeclimate/maintainability)
 
-This is experimental.
+## Description
 
 Serialize json directly from postgres (9.4+).
 

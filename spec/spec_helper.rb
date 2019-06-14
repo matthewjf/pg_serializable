@@ -16,7 +16,9 @@ Dir[File.join(__dir__, '../models/**/*.rb')].each { |f| require f }
 if ENV['CODECOV_TOKEN']
   require 'simplecov'
   require 'codecov'
-  SimpleCov.start
+  SimpleCov.start do
+    add_filter "/spec/"
+  end
   SimpleCov.formatter = SimpleCov::Formatter::Codecov
 end
 

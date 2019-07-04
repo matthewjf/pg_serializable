@@ -598,6 +598,10 @@ Response:
 ]
 ```
 
+### Single Table Inheritance
+
+It works with single table inheritance. Traits must be defined on each class individually.
+
 ## Without Rails
 
 Rails isn't a dependency of this gem. However, setting it up to work without Rails takes some work. The `specs/support` folder has the initialization code needed to run the gem with just `ActiveSupport` and `ActiveRecord`.

@@ -8,12 +8,24 @@ RSpec.describe "json" do
     let!(:labor) { FactoryBot.create(:labor_component) }
 
     it 'works for the base class' do
-      json_result = JSON.parse(component.json)
-      expect(json_result).to eq({
-        "id" => component.id,
-        "name" => component.name,
-        "type" => component.type
-      })
+      json_result = JSON.parse(Component.json)
+      expect(json_result).to match_array([
+        {
+          "id" => component.id,
+          "name" => component.name,
+          "type" => component.type
+        },
+        {
+          "id" => material.id,
+          "name" => material.name,
+          "type" => material.type
+        },
+        {
+          "id" => labor.id,
+          "name" => labor.name,
+          "type" => labor.type
+        }
+      ])
     end
 
     it 'works for the inherited classes with scope' do

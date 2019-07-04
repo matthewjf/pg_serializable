@@ -5,20 +5,22 @@ module PgSerializable
         table_alias = next_alias!
 
         klass = subject.class
+        base_class = klass.base_class
         select_sql = json_build_object(visit(klass.trait_manager, trait: trait, table_alias: table_alias)).to_sql
-        from_sql = klass.where(id: subject.id).limit(1).to_sql
+        from_sql = base_class.where(id: subject.id).limit(1).to_sql
 
-        klass.select(select_sql).from("#{as(from_sql, table_alias)}")
+        base_class.select(select_sql).from("#{as(from_sql, table_alias)}")
       end
 
       def visit_relation(subject, table_alias: nil, trait: :default)
         table_alias ||= next_alias!
 
         klass = subject.klass
+        base_class = klass.base_class
         select_sql = coalesce(json_agg(json_build_object(visit(klass.trait_manager, trait: trait, table_alias: table_alias)))).to_sql
         from_sql = subject.to_sql
 
-        klass.select(select_sql).from("#{as(from_sql, table_alias)}")
+        base_class.select(select_sql).from("#{as(from_sql, table_alias)}")
       end
 
       def visit_class(subject, trait: :default, **kwargs)

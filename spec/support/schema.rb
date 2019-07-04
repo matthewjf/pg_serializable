@@ -49,6 +49,11 @@ ActiveRecord::Schema.define do
     t.index ["product_id"], name: "index_variations_on_product_id"
   end
 
+  create_table "components", force: :cascade do |t|
+    t.string "type"
+    t.string "name"
+  end
+
   add_foreign_key "categories_products", "categories"
   add_foreign_key "categories_products", "products"
   add_foreign_key "products", "labels"

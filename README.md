@@ -1,12 +1,13 @@
 # PgSerializable
 [![codecov](https://codecov.io/gh/matthewjf/pg_serializable/branch/master/graph/badge.svg)](https://codecov.io/gh/matthewjf/pg_serializable)
 [![Maintainability](https://api.codeclimate.com/v1/badges/f3450fdd21d38e2a2fe6/maintainability)](https://codeclimate.com/github/matthewjf/pg_serializable/maintainability)
+[![Gem Version](https://badge.fury.io/rb/pg_serializable.svg)](https://badge.fury.io/rb/pg_serializable)
 
 ## Description
 
 Serialize json directly from postgres (9.4+).
 
-## Why?
+## Motivation
 Models:
 ```ruby
 class Product < ApplicationRecord
@@ -102,6 +103,18 @@ And then execute:
 Or install it yourself as:
 
     $ gem install pg_serializable
+
+## Configuration
+
+To ensure traits are valid during rails initialization instead of when accessed:
+```ruby
+# config/initializers/pg_serializable.rb
+PgSerializable.validate_traits!
+```
+
+## Migrating from version 1 to 2
+
+Trait validations were occasionally running before the class's traits were loaded when there are complex dependencies. These were moved out of the class definition. To maintain existing behavior, add `PgSerializable.validate_traits!` to an initializer. See [configuration](#Configuration).
 
 ## Usage
 

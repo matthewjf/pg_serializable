@@ -21,6 +21,15 @@ end
 module PgSerializable
   extend ActiveSupport::Concern
 
+  def self.validate_traits!
+    ActiveRecord::Base.descendants.each do |klass|
+      begin
+        klass.validate_traits!
+      rescue NoMethodError, ActiveRecord::NoDatabaseError
+      end
+    end
+  end
+
   included do
     include Visitable
 
@@ -36,10 +45,6 @@ module PgSerializable
 
     def serializable(&blk)
       trait_manager.instance_eval &blk
-      begin
-        validate_traits!
-      rescue ActiveRecord::NoDatabaseError
-      end
     end
 
     def trait_manager

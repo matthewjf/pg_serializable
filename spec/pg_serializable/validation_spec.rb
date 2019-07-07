@@ -3,7 +3,7 @@ require 'spec_helper'
 RSpec.describe "validation" do
   context "attributes" do
     it "raises error when column is missing" do
-      expect do
+      # expect do
         class Product < ApplicationRecord
           serializable do
             default do
@@ -11,11 +11,13 @@ RSpec.describe "validation" do
             end
           end
         end
-      end.to raise_error(PgSerializable::AttributeError)
+      # end.to raise_error(PgSerializable::AttributeError)
+
+      expect { PgSerializable.validate_traits! }.to raise_error(PgSerializable::AttributeError)
     end
 
     it "doesn't raise an error when column exists" do
-      expect do
+      # expect do
         class Product < ApplicationRecord
           serializable do
             default { attribute :name }
@@ -24,13 +26,15 @@ RSpec.describe "validation" do
             end
           end
         end
-      end.to_not raise_error
+      # end.to_not raise_error
+
+      expect { PgSerializable.validate_traits! }.to_not raise_error
     end
   end
 
   context "associations" do
     it "raises error when association doesn't exist" do
-      expect do
+      # expect do
         class Product < ApplicationRecord
           serializable do
             default do
@@ -38,11 +42,12 @@ RSpec.describe "validation" do
             end
           end
         end
-      end.to raise_error(PgSerializable::AssociationError)
+      # end.to raise_error(PgSerializable::AssociationError)
+      expect { PgSerializable.validate_traits! }.to raise_error(PgSerializable::AssociationError)
     end
 
     it "raises error when cycles exist" do
-      expect do
+      #expect do
         class Label < ApplicationRecord
           has_many :products
           serializable do
@@ -59,7 +64,8 @@ RSpec.describe "validation" do
             end
           end
         end
-      end.to raise_error(PgSerializable::AssociationError)
+      # end.to raise_error(PgSerializable::AssociationError)
+      expect { PgSerializable.validate_traits! }.to raise_error(PgSerializable::AssociationError)
     end
   end
 end

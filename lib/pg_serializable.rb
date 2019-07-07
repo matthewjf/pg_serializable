@@ -25,7 +25,7 @@ module PgSerializable
     ActiveRecord::Base.descendants.each do |klass|
       begin
         klass.validate_traits!
-      rescue NoMethodError
+      rescue NoMethodError, ActiveRecord::NoDatabaseError
       end
     end
   end

@@ -7,8 +7,6 @@ ActiveRecord::Base.connection.execute <<-SQL
 SQL
 
 ActiveRecord::Schema.define do
-  enable_extension "plpgsql"
-
   create_table "categories", force: :cascade do |t|
     t.string "name"
     t.column "category_type", "category_type"

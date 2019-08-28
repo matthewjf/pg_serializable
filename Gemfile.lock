@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    pg_serializable (2.1.1)
+    pg_serializable (3.0.0)
       activerecord (>= 5.2, < 7.0)
       activesupport (>= 5.2, < 7.0)
       oj (~> 3.6)

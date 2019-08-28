@@ -8,7 +8,7 @@ RSpec.describe "json" do
     let!(:labor) { FactoryBot.create(:labor_component) }
 
     it 'works for the base class' do
-      json_result = JSON.parse(Component.json)
+      json_result = Component.json
       expect(json_result).to match_array([
         {
           "id" => component.id,
@@ -29,7 +29,7 @@ RSpec.describe "json" do
     end
 
     it 'works for the inherited classes with scope' do
-      json_results = JSON.parse(MaterialComponent.limit(10).json)
+      json_results = MaterialComponent.limit(10).json
 
       expect(json_results).to eq([
         {
@@ -40,7 +40,7 @@ RSpec.describe "json" do
     end
 
     it 'works for single records of inherited classes' do
-      json_result = JSON.parse(labor.json)
+      json_result = labor.json
       expect(json_result).to eq({
         "id" => labor.id
       })

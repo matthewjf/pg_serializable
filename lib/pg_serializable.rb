@@ -57,7 +57,7 @@ module PgSerializable
 
     def to_pg_json(scope)
       res = scope.as_json.first
-      ::Oj.dump(res['coalesce'] || res['json_build_object'])
+      res['coalesce'] || res['json_build_object']
     end
 
     private

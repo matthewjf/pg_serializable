@@ -11,12 +11,10 @@ RSpec.describe "json" do
     let(:category1) { FactoryBot.create(:category, products: [product]) }
     let(:category2) { FactoryBot.create(:category, products: [product]) }
 
-    subject { JSON.parse(product.json(trait: trait)) }
+    subject { product.json(trait: trait) }
 
     it 'works with simple attributes without trait' do
-      json_result = JSON.parse(product.json)
-
-      expect(json_result).to eq({
+      expect(product.json).to eq({
         'id' => product.id,
         'name' => product.name
       })
@@ -30,7 +28,7 @@ RSpec.describe "json" do
     end
 
     context 'with postgres enum' do
-      subject { JSON.parse(category1.json(trait: :with_postgres_enum)) }
+      subject { category1.json(trait: :with_postgres_enum) }
 
       it do
         should eq({ 'id' => category1.id, 'category_type' => category1.category_type })
@@ -107,7 +105,7 @@ RSpec.describe "json" do
       end
 
       it 'supports :has_many through a :belongs_to' do
-        result_json = JSON.parse(color1.json(trait: :has_many_through))
+        result_json = color1.json(trait: :has_many_through)
 
         expect(result_json).to eq({
           'id' => color1.id,
@@ -156,12 +154,12 @@ RSpec.describe "json" do
     let!(:category1) { FactoryBot.create(:category, products: [product1]) }
     let!(:category2) { FactoryBot.create(:category, products: [product1, product2]) }
 
-    subject { JSON.parse(scope.json(trait: trait)) }
+    subject { scope.json(trait: trait) }
     let(:trait) { :default }
     let(:scope) { Product }
 
     it 'works without trait' do
-      expect(JSON.parse(Product.json)).to match_array([
+      expect(Product.json).to match_array([
         product1.slice(:name, :id),
         product2.slice(:name, :id),
         product3.slice(:name, :id)

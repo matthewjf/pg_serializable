@@ -1,9 +1,15 @@
 require "active_record/relation"
 require "active_record/schema"
 
+ActiveRecord::Base.connection.execute <<-SQL
+  DROP TYPE category_type CASCADE;
+  CREATE TYPE category_type AS ENUM ('annotation', 'facade');
+SQL
+
 ActiveRecord::Schema.define do
   create_table "categories", force: :cascade do |t|
     t.string "name"
+    t.column "category_type", "category_type"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end

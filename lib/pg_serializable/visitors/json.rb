@@ -57,7 +57,7 @@ module PgSerializable
         enum_hash = subject.klass.defined_enums[subject.column_name.to_s]
         val = "CASE \"#{table_alias}\".\"#{subject.column_name}\" " +
         enum_hash.map do |val, int|
-          "WHEN #{int} THEN \'#{subject.prc ? subject.prc.call(val) : val}\'"
+          "WHEN #{int.is_a?(String) ? "'#{int}'" : int} THEN \'#{subject.prc ? subject.prc.call(val) : val}\'"
         end.join(' ') + " ELSE NULL END"
         "#{key}, #{val}"
       end

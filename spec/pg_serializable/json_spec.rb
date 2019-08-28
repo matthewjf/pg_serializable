@@ -29,6 +29,14 @@ RSpec.describe "json" do
       end
     end
 
+    context 'with postgres enum' do
+      subject { JSON.parse(category1.json(trait: :with_postgres_enum)) }
+
+      it do
+        should eq({ 'id' => category1.id, 'category_type' => category1.category_type })
+      end
+    end
+
     context 'with custom sql' do
       let(:trait) { :custom_sql }
       it 'works' do

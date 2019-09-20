@@ -7,6 +7,23 @@
 
 Serialize json directly from postgres (9.4+).
 
+## Upgrading from version 2.x.x to 3.x.x
+
+Serialization returns a PORO instead of a json string. If you have code like:
+```ruby
+OJ.load(Product.where(id: ids).json)
+```
+
+You can replace it with:
+```ruby
+Product.where(id: ids).json
+```
+
+To automatically use OJ to serialize your POROs to json strings, add this code to your initialization:
+```ruby
+Oj.optimize_rails()
+```
+
 ## Motivation
 Models:
 ```ruby

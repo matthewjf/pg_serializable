@@ -1,10 +1,9 @@
 PATH
   remote: .
   specs:
-    pg_serializable (3.0.0)
+    pg_serializable (3.0.1)
       activerecord (>= 5.2, < 7.0)
       activesupport (>= 5.2, < 7.0)
-      oj (~> 3.6)
       pg (>= 1.1)
 
 GEM
@@ -39,7 +38,6 @@ GEM
     json (2.2.0)
     method_source (0.9.2)
     minitest (5.11.3)
-    oj (3.9.0)
     pg (1.1.4)
     pry (0.12.2)
       coderay (~> 1.1.0)

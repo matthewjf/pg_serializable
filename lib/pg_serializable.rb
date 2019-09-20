@@ -1,4 +1,3 @@
-require 'oj'
 require 'active_support/concern'
 require 'active_support/core_ext/module/delegation'
 require 'pg_serializable/errors'

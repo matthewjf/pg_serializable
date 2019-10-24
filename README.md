@@ -550,7 +550,7 @@ class Variation < ApplicationRecord
   serializable do
     default do
       attributes :id
-      belongs_to: :color
+      belongs_to :color
     end
 
     trait :for_products do

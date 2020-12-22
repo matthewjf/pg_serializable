@@ -34,7 +34,7 @@ GEM
     ffaker (2.11.0)
     i18n (1.8.2)
       concurrent-ruby (~> 1.0)
-    json (2.2.0)
+    json (2.3.1)
     method_source (0.9.2)
     minitest (5.14.1)
     pg (1.2.3)

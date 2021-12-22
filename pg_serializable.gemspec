@@ -29,7 +29,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rake", "~> 13.0"
   spec.add_development_dependency "rspec", "~> 3.0"
 
-  spec.add_runtime_dependency "activesupport", ">= 5.2", "< 7.0"
-  spec.add_runtime_dependency "activerecord", ">= 5.2", "< 7.0"
+  spec.add_runtime_dependency "activesupport", ">= 5.2", "< 8.0"
+  spec.add_runtime_dependency "activerecord", ">= 5.2", "< 8.0"
   spec.add_runtime_dependency "pg", ">= 1.1"
 end
